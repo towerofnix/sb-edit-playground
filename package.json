@@ -1,0 +1,17 @@
+{
+  "name": "sb-edit-playground",
+  "version": "0.0.1",
+  "description": "for u only (and u and u and u)",
+  "main": "index.js",
+  "dependencies": {
+    "mkdirp": "^0.5.1",
+    "sb-edit": "^0.10.0",
+    "source-map-support": "^0.5.16"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "GPL-3.0"
+}

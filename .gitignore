@@ -1,0 +1,5 @@
+*.sb3
+*.sb2
+out
+node_modules
+/scratch-js
