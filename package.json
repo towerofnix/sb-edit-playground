@@ -5,6 +5,7 @@
   "main": "index.js",
   "dependencies": {
     "mkdirp": "^0.5.1",
+    "rimraf": "^3.0.2",
     "sb-edit": "^0.10.0",
     "source-map-support": "^0.5.16"
   },

@@ -1,11 +1,38 @@
-const { Project } = require('sb-edit');
+const { Costume, Project } = require('sb-edit');
+
+const { spawn } = require('child_process');
+const { stringify } = require('./stringify');
 const fs = require('fs');
-const util = require('util');
 const path = require('path');
+const util = require('util');
 
 const mkdirpp = util.promisify(require('mkdirp'));
+const rimrafp = util.promisify(require('rimraf'));
+
+const readdir = util.promisify(fs.readdir);
 const readFile = util.promisify(fs.readFile);
 const writeFile = util.promisify(fs.writeFile);
+
+function promisifyProcess(proc, showLogging = true) {
+    // Takes a process (from the child_process module) and returns a promise
+    // that resolves when the process exits (or rejects, if the exit code is
+    // non-zero).
+
+    return new Promise((resolve, reject) => {
+        if (showLogging) {
+            proc.stdout.pipe(process.stdout)
+            proc.stderr.pipe(process.stderr)
+        }
+
+        proc.on('exit', code => {
+            if (code === 0) {
+                resolve()
+            } else {
+                reject(code)
+            }
+        })
+    })
+}
 
 function progressPromiseAll(msg, array) {
     let done = 0, total = array.length;
@@ -22,6 +49,33 @@ function progressPromiseAll(msg, array) {
 };
 
 const outputHandlers = {
+    async "sb2"(project, util) {
+        if (!project.toSb2) {
+            console.error("toSb2 isn't implemented!");
+            process.exit(1);
+        }
+
+        const { json, counterMap } = project.toSb2({
+            getSoundFormat(sound) {
+                // TODO: Implement ADPCM/Squeak(?) sound detection.
+                return "";
+            }
+        })
+
+        const prettyJSON = stringify(JSON.parse(json));
+        await util.write("project.json", prettyJSON);
+
+        await util.writeAssets(asset => {
+            const index = counterMap[asset.ext].indexOf(asset)
+            return `${index}.${asset.ext}`;
+        });
+
+        const out = util.getOutputDirectory();
+        await promisifyProcess(spawn("zip", [
+            path.join(out, "out-sb2.sb2"),
+            ...(await readdir(out)).map(file => path.join(out, file))
+        ]));
+    },
     async "scratch-js"(project, util) {
         await progressPromiseAll('Writing files', Object.entries(project.toScratchJS({
             scratchJSURL: "/scratch-js/index.mjs",
@@ -70,11 +124,14 @@ async function main() {
             await mkdirpp(path.dirname(out));
             await writeFile(out, data);
         },
-        async writeAssets() {
+        async writeAssets(getAssetPath = this.getAssetPath) {
             const allAssets = [project.stage, ...project.sprites].reduce((acc, target) => acc.concat(target.costumes, target.sounds), []);
-            await progressPromiseAll('Writing assets', allAssets.map(asset => this.writeQuiet(this.getAssetPath(asset), Buffer.from(asset.asset))));
+            await progressPromiseAll('Writing assets', allAssets.map(asset => this.writeQuiet(getAssetPath(asset), Buffer.from(asset.asset))));
         }
     };
+
+    await rimrafp(util.getOutputDirectory());
+    await mkdirpp(util.getOutputDirectory());
 
     await outputHandlers[process.argv[3]](project, util);
 
