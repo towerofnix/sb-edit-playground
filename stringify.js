@@ -1,6 +1,5 @@
 // Derived from JSON.as by John Maloney. Original license/info follows.
 
-
 /*
  * Scratch Project Editor and Player
  * Copyright (C) 2014 Massachusetts Institute of Technology
@@ -155,4 +154,9 @@ module.exports = class ScratchFlashJSON {
     if (this._tabs.length == 0) return;
     this._tabs = this._tabs.slice(0, this._tabs.length - TAB_STRING.length);
   }
+}
+
+if (require.main === module) {
+    const fs = require('fs');
+    console.log(module.exports.stringify(JSON.parse(fs.readFileSync(0, 'utf-8'))));
 }
