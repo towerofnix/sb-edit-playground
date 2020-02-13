@@ -143,10 +143,8 @@ async function main() {
         },
         async zip(ext = "zip") {
             const out = this.getOutputDirectory();
-            await promisifyProcess(spawn("zip", [
-                path.join(out, `${basename}.${ext}`),
-                ...(await readdir(out)).map(file => path.join(out, file))
-            ]));
+            const zip = spawn("zip", [`${basename}.${ext}`, ...await readdir(out)], {cwd: out});
+            await promisifyProcess(zip);
         }
     };
 
