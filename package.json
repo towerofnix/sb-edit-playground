@@ -11,7 +11,7 @@
   },
   "devDependencies": {},
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "watch": "cd sb-edit; npm run watch -- --sourcemap"
   },
   "author": "",
   "license": "GPL-3.0"

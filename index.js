@@ -1,3 +1,5 @@
+require('source-map-support/register');
+
 const { Costume, Project } = require('sb-edit');
 
 const { spawn } = require('child_process');
