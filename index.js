@@ -81,11 +81,13 @@ const outputHandlers = {
             process.exit(1);
         }
 
-        const { json } = project.toSb3({});
+        const { json } = project.toSb3({
+            warn: message => console.warn(`\x1b[33m${message}\x1b[0m`)
+        });
         const prettyJSON = stringify(JSON.parse(json));
         await util.write("project.json", prettyJSON);
         await util.writeAssets();
-        await util.zip("sb3");
+        await util.zip("sb3", false);
     },
 
     async "scratch-js"(project, util) {
@@ -143,10 +145,10 @@ async function main() {
             const allAssets = [project.stage, ...project.sprites].reduce((acc, target) => acc.concat(target.costumes, target.sounds), []);
             await progressPromiseAll('Writing assets', allAssets.map(asset => this.writeQuiet(getAssetPath(asset), Buffer.from(asset.data || asset.asset))));
         },
-        async zip(ext = "zip") {
+        async zip(ext = "zip", showLogging = true) {
             const out = this.getOutputDirectory();
             const zip = spawn("zip", [`${basename}.${ext}`, ...await readdir(out)], {cwd: out});
-            await promisifyProcess(zip);
+            await promisifyProcess(zip, showLogging);
         }
     };
 
