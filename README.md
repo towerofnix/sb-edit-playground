@@ -3,7 +3,8 @@
 ## Setup
 
 ```
-# this setup assumes scratch-js & sb-edit exist in pwd
+# this setup assumes you have Leopard (formerly scratch-js)
+& sb-edit exist in pwd
 # it also assumes you have run npm link in sb-edit
 git clone https://github.com/towerofnix/sb-edit-playground
 cd sb-edit-playground
