@@ -1,7 +1,7 @@
 {
   "name": "sb-edit-playground",
-  "version": "0.0.1",
-  "description": "for u only (and u and u and u)",
+  "version": "0.0.2",
+  "description": "Convert projects with sb-edit for local development",
   "main": "index.js",
   "dependencies": {
     "leopard": "^1.3.3",
@@ -10,10 +10,6 @@
     "sb-edit": "^0.13.9",
     "source-map-support": "^0.5.16"
   },
-  "devDependencies": {},
-  "scripts": {
-    "watch": "cd sb-edit; npm run watch -- --sourcemap"
-  },
-  "author": "",
-  "license": "GPL-3.0"
+  "author": "Quasar Nebula <qznebula@protonmail.com>",
+  "license": "ISC"
 }
