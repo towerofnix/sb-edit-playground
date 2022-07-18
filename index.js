@@ -51,6 +51,20 @@ function progressPromiseAll(msg, array) {
 };
 
 const outputHandlers = {
+    async "leopard"(project, util) {
+        if (!project.toLeopard) {
+            console.error("toLeopard isn't implemented!");
+            process.exit(1);
+        }
+
+        await progressPromiseAll('Writing files', Object.entries(project.toLeopard({
+            leopardJSURL: "/node_modules/leopard/dist/index.esm.js",
+            leopardJSCSSURL: "/node_modules/leopard/dist/index.min.css",
+            getAssetURL: util.getAssetPath
+        })).map(([ filename, contents ]) => util.writeQuiet(filename, contents)));
+        await util.writeAssets();
+    },
+
     async "sb2"(project, util) {
         if (!project.toSb2) {
             console.error("toSb2 isn't implemented!");
@@ -90,16 +104,12 @@ const outputHandlers = {
         await util.zip("sb3", false);
     },
 
-    async "scratch-js"(project, util) {
-        await progressPromiseAll('Writing files', Object.entries(project.toScratchJS({
-            scratchJSURL: "/scratch-js/index.mjs",
-            scratchJSCSSURL: "/scratch-js/index.css",
-            getAssetURL: util.getAssetPath
-        })).map(([ filename, contents ]) => util.writeQuiet(filename, contents)));
-        await util.writeAssets();
-    },
-
     async "scratchblocks"(project, util) {
+        if (!project.toScratchblocks) {
+            console.error("toScratchblocks isn't implemented!");
+            process.exit(1);
+        }
+
         await progressPromiseAll('Writing files', Object.entries(project.toScratchblocks())
             .map(([ target, contents ]) => util.writeQuiet(target + '.txt', contents))
         );

@@ -1,33 +1,50 @@
 # sb-edit-playground
 
+A set of handy utilities for working with sb-edit project IO locally.
+
 ## Setup
 
+Install dependencies:
+
 ```
-# this setup assumes scratch-js & sb-edit exist in pwd
-# it also assumes you have run npm link in sb-edit
-git clone https://github.com/towerofnix/sb-edit-playground
-cd sb-edit-playground
-ln -s ../scratch-js/scratch-js scratch-js
-ln -s ../sb-edit/src sb-edit
+cd ~/path/to/sb-edit-playground
+npm install
+```
+
+Use NPM to link `leopard` and `sb-edit` from your local project/git directories, making your local clones available for requiring in other projects:
+
+```
+cd ~/path/to/leopard
+npm link
+
+cd ~/path/to/sb-edit
+npm link
+```
+
+Then link `leopard` and `sb-edit` from inside `sb-edit-playground`:
+
+```
+cd ~/path/to/sb-edit-playground
+npm link leopard
 npm link sb-edit
-
-# to run sb-edit:
-# cd sb-edit-playground
-node index.js (my file.sb3) (output-format)
-# result will be in sb-edit-playground/out/(output-format)
-# run index.js without an output format to get a list
-
-# while developing sb-edit:
-# cd sb-edit-playground/sb-edit
-npm run watch
-
-# while testing scratch-js output:
-# cd sb-edit-playground
-npx http-server -p 3001 # or your favorite port
-
-# git works in the linked directories!
-# it will target scratch-js or sb-edit accordingly
-# also be sure to watch out when undoing changes, etc
-# always do a git status before you accidentally run
-# git checkout -- . in the wrong repository 0_0
 ```
+
+## Working with `sb-edit-playground`
+
+Compile to Leopard:
+
+```
+node index.js path/to/project.sb3 leopard
+```
+
+View Leopard project in browser:
+
+```
+cd ~/path/to/sb-edit-playground
+npx http-server -p 3001
+# then open http://localhost:3001/out/leopard/
+```
+
+Other formats are theoretically implement but have practical uses so unorthodox I'm sure you can figure 'em out by reading `index.js` if you must!
+
+You can also list supported output formats by running just `node index.js path/to/project.sb3` without an output format (like `leopard`) specified.
