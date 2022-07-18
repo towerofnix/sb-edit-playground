@@ -21,12 +21,11 @@ cd ~/path/to/sb-edit
 npm link
 ```
 
-Then link `leopard` and `sb-edit` from inside `sb-edit-playground`:
+Then link `leopard` and `sb-edit` **at the same time** from inside `sb-edit-playground` (provided you're developing both):
 
 ```
 cd ~/path/to/sb-edit-playground
-npm link leopard
-npm link sb-edit
+npm link leopard sb-edit
 ```
 
 ## Working with `sb-edit-playground`
