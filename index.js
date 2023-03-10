@@ -14,6 +14,7 @@ const rimrafp = util.promisify(require('rimraf'));
 const readdir = util.promisify(fs.readdir);
 const readFile = util.promisify(fs.readFile);
 const writeFile = util.promisify(fs.writeFile);
+const copyFile = util.promisify(fs.copyFile);
 
 function promisifyProcess(proc, showLogging = true) {
     // Takes a process (from the child_process module) and returns a promise
@@ -56,12 +57,17 @@ const outputHandlers = {
             console.error("toLeopard isn't implemented!");
             process.exit(1);
         }
-
         await progressPromiseAll('Writing files', Object.entries(project.toLeopard({
-            leopardJSURL: "/node_modules/leopard/dist/index.esm.js",
-            leopardJSCSSURL: "/node_modules/leopard/dist/index.min.css",
+            leopardJSURL: "leopard.esm.js",
+            leopardJSCSSURL: "leopard.min.css",
             getAssetURL: util.getAssetPath
         })).map(([ filename, contents ]) => util.writeQuiet(filename, contents)));
+
+        const js = (await readFile("node_modules/leopard/dist/index.esm.js")).toString();
+        await util.writeQuiet("leopard.esm.js", js.replace("index.esm.js.map", "leopard.esm.js.map"));
+
+        await util.copyQuiet("node_modules/leopard/dist/index.esm.js.map", "leopard.esm.js.map");
+        await util.copyQuiet("node_modules/leopard/dist/index.min.css", "leopard.min.css");
         await util.writeAssets();
     },
 
@@ -101,7 +107,7 @@ const outputHandlers = {
         const prettyJSON = stringify(JSON.parse(json));
         await util.write("project.json", prettyJSON);
         await util.writeAssets();
-        await util.zip("sb3", false);
+        await util.zip("sb3", true);
     },
 
     async "scratchblocks"(project, util) {
@@ -150,6 +156,11 @@ async function main() {
             const out = path.join(this.getOutputDirectory(), filename);
             await mkdirpp(path.dirname(out));
             await writeFile(out, data);
+        },
+        async copyQuiet(sourceFilename, filename) {
+            const out = path.join(this.getOutputDirectory(), filename);
+            await mkdirpp(path.dirname(out));
+            await copyFile(sourceFilename, out);
         },
         async writeAssets(getAssetPath = this.getAssetPath) {
             const allAssets = [project.stage, ...project.sprites].reduce((acc, target) => acc.concat(target.costumes, target.sounds), []);
